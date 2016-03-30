@@ -3,7 +3,5 @@ Code for the paper "An investigation of recurrent neural network architectures u
 Requirements :
 
     1. python 3.5
-    
     2. Keras (http://keras.io)
-    
     3. Theano (http://deeplearning.net/software/theano/)
