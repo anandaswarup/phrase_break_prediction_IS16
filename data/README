@@ -1,0 +1,15 @@
+The data consists of the following features extracted for each utterance (from Festival utterance structure): 
+    1. word 
+    2. break associated with that word (generated from acoustics)
+
+The correspondence of breaks with TOBI break levels
+    1. NB (non-break) -> TOBI level 1
+    2. B (break) -> TOBI level 3 and 4 (Actually TOBI level 4 corresponds to BB, but in our data B and BB have been collapsed together)
+
+Note : Festival phrasing rules do not include TOBI level 2
+
+The data is available for the following languages:
+    1. English : (Audiobook data)
+        a. EMMA by Jane Austen 
+        b. Mansfield Park by Jane Austen 
+        c. Pride and Prejudice by Jane Austen
