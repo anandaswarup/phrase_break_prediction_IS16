@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Script to train phrase break prediction using uni-directional Elman RNN"""
+"""Script to train phrase break prediction using uni-directional LSTM RNN"""
 
 # python imports
 import os, codecs, argparse
@@ -36,13 +36,13 @@ def batch_generator(text, labels, win_size = 1):
 
             yield x, y 
 
-def build_LSTM_model(maxlen, vocab_size, embedding_dims, rnn_layer_dim, num_classes):
-    """Build the RNN model"""
+def build_LSTM_model(vocab_size, embedding_dims, rnn_layer_dim, num_classes):
+    """Build the LSTM model"""
     model = Sequential()             # Sequential model
     # Embedding layer
-    model.add(Embedding(vocab_size, embedding_dims, batch_input_shape = (1, maxlen)))
+    model.add(Embedding(vocab_size, embedding_dims))
     # Recurrent layer
-    model.add(LSTM(int(rnn_layer_dim), init = 'glorot_uniform', inner_init = 'orthogonal', forget_bias_init='one', activation = 'tanh', inner_activation='hard_sigmoid', W_regularizer = None, U_regularizer = None, b_regularizer = None, dropout_W = 0.0, dropout_U = 0.0, return_sequences = True, stateful = True))
+    model.add(LSTM(int(rnn_layer_dim), init = 'glorot_uniform', inner_init = 'orthogonal', forget_bias_init='one', activation = 'tanh', inner_activation='hard_sigmoid', W_regularizer = None, U_regularizer = None, b_regularizer = None, dropout_W = 0.0, dropout_U = 0.0, return_sequences = True, stateful = False))
     # Time distributed dense layer (activation is softmax, since it is a classification problem)
     model.add(TimeDistributedDense(num_classes, init = 'glorot_uniform', activation = 'softmax'))
 
@@ -97,12 +97,12 @@ def run_experiment():
     maxlen = np.max([len(seq) for seq in text])
 
     # LSTM model
-    model = build_LSTM_model(maxlen, vocab_size, embedding_dims, lstm_layer_dim, num_classes)
+    model = build_LSTM_model(vocab_size, embedding_dims, lstm_layer_dim, num_classes)
     # Optimizer
     sgd = SGD(lr = l_rate, decay = 1e-6, momentum = mom, nesterov = True)
 
     print("Compiling the model")
-    model.compile(loss = 'categorical_crossentropy', optimizer = 'sgd')
+    model.compile(loss = 'categorical_crossentropy', optimizer = 'sgd', metrics = ['accuracy'])
 
     ########## RNN TRAINING AND EVALUATION ##########
     print("Training the model")

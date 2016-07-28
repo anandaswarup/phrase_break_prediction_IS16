@@ -36,13 +36,13 @@ def batch_generator(text, labels, win_size = 1):
 
             yield x, y 
 
-def build_RNN_model(maxlen, vocab_size, embedding_dims, rnn_layer_dim, num_classes):
+def build_RNN_model(vocab_size, embedding_dims, rnn_layer_dim, num_classes):
     """Build the RNN model"""
     model = Sequential()             # Sequential model
     # Embedding layer
-    model.add(Embedding(vocab_size, embedding_dims, batch_input_shape = (1, maxlen)))
+    model.add(Embedding(vocab_size, embedding_dims))
     # Recurrent layer
-    model.add(SimpleRNN(int(rnn_layer_dim), init = 'glorot_uniform', inner_init = 'orthogonal', activation = 'tanh', W_regularizer = None, U_regularizer = None, b_regularizer = None, dropout_W = 0.0, dropout_U = 0.0, return_sequences = True, stateful = True))
+    model.add(SimpleRNN(int(rnn_layer_dim), init = 'glorot_uniform', inner_init = 'orthogonal', activation = 'tanh', W_regularizer = None, U_regularizer = None, b_regularizer = None, dropout_W = 0.0, dropout_U = 0.0, return_sequences = True, stateful = False))
     # Time distributed dense layer (activation is softmax, since it is a classification problem)
     model.add(TimeDistributedDense(num_classes, init = 'glorot_uniform', activation = 'softmax'))
 
@@ -96,12 +96,12 @@ def run_experiment():
     num_classes = len(label2index)
     maxlen = np.max([len(seq) for seq in text])
     # RNN model
-    model = build_RNN_model(maxlen, vocab_size, embedding_dims, rnn_layer_dim, num_classes)
+    model = build_RNN_model(vocab_size, embedding_dims, rnn_layer_dim, num_classes)
     # Optimizer
     sgd = SGD(lr = l_rate, decay = 1e-6, momentum = mom, nesterov = True)
-
+   
     print("Compiling the model")
-    model.compile(loss = 'categorical_crossentropy', optimizer = 'sgd')
+    model.compile(loss = 'categorical_crossentropy', optimizer = 'sgd', metrics = ['accuracy'])
 
     ########## RNN TRAINING AND EVALUATION ##########
     print("Training the model")
